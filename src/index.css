@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-editorial-bg: #fcfbfa; /* Luxury gallery warm ivory */
+  --color-editorial-ink: #111115; /* Saturated soft noir */
+  --color-editorial-accent: #2c2084; /* Deep historical navy-indigo */
+  --color-editorial-accent-foreground: #ffffff;
+  --color-editorial-muted: #5e646e; /* Luxurious soft muted slate */
+  --color-editorial-line: #eae8df; /* Warm book edge divider line */
+  --color-editorial-border: #dcd9cf; /* Elegant warm card boundary */
+  --color-editorial-surface: #ffffff; /* Squeaky clean surface white */
+}
+
+@layer base {
+  body {
+    @apply bg-editorial-bg text-slate-800 antialiased font-sans selection:bg-slate-900 selection:text-white;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight text-slate-900;
+  }
+
+  p {
+    @apply font-sans leading-relaxed;
+  }
+}
+
+@layer utilities {
+  .text-serif {
+    @apply font-serif italic;
+  }
+  
+  .micro-label {
+    @apply font-mono text-[0.7rem] uppercase tracking-[0.18em] font-bold opacity-60;
+  }
+
+  .glass-surface {
+    @apply bg-white/90 backdrop-blur-xl border border-editorial-line shadow-sm;
+  }
+
+  .technical-grid {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, rgba(160, 150, 130, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(160, 150, 130, 0.035) 1px, transparent 1px);
+  }
+}
