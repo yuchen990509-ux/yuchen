@@ -1,7 +1,113 @@
-import { motion } from 'motion/react';
-import { Lightbulb, Zap, Users, Quote } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Lightbulb, Zap, Users, Quote, X, Mail, Check, Download, Sparkles, Code } from 'lucide-react';
 
-export default function AIIntro() {
+interface AIIntroProps {
+  onViewChange?: (view: any) => void;
+}
+
+export default function AIIntro({ onViewChange }: AIIntroProps) {
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [step, setStep] = useState<'input' | 'compiling' | 'success'>('input');
+  const [email, setEmail] = useState('');
+  const [progress, setProgress] = useState(0);
+  const [logIndex, setLogIndex] = useState(0);
+
+  const compilationLogs = [
+    "連線核心 Atlas Node 節點...",
+    "提取最新 AI 趨勢分類指標...",
+    "封裝 12 款主流工具分析圖表...",
+    "綁定安全 TLS 憑證與下載授權金鑰...",
+    "報告渲染封包輸出完畢...",
+  ];
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (step === 'compiling') {
+      setProgress(0);
+      setLogIndex(0);
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+              triggerFileDownload();
+              setStep('success');
+            }, 600);
+            return 100;
+          }
+          const increment = Math.floor(Math.random() * 15) + 5;
+          const nextVal = Math.min(prev + increment, 100);
+          
+          // Speed up compilation steps
+          if (nextVal > 20 && nextVal <= 45) setLogIndex(1);
+          else if (nextVal > 45 && nextVal <= 70) setLogIndex(2);
+          else if (nextVal > 70 && nextVal <= 90) setLogIndex(3);
+          else if (nextVal > 90) setLogIndex(4);
+
+          return nextVal;
+        });
+      }, 150);
+
+      return () => clearInterval(interval);
+    }
+  }, [step]);
+
+  const triggerFileDownload = () => {
+    try {
+      const fileContent = `====================================================
+AI ATLAS JOURNAL - 2024 COMPLETE AI TRENDS REPORT
+====================================================
+授權信箱: ${email}
+發布時間: ${new Date().toLocaleDateString()}
+報告編號: ATLAS_REP_4009_SECURE
+
+1. 核心觀點
+AI 不僅是程式碼的堆疊，它是人類智慧的鏡像。
+工具的進化，推動了「文字即程式碼」的新範式。
+
+2. 重點工具一覽與特長精華
+- ChatGPT: 通用寫作、軟體開發與創意思維的頂級引擎。
+- Claude: 富含文學感與長文本消化能力的超強大腦。
+- Midjourney: 概念設計與商業視覺創新的美學巔峰。
+- Perplexity: 資訊研究、附帶精準出處引用的精準檢索。
+
+3. 未來三大戰略指引
+- 生產力重塑：體力重複性勞動全面轉入自動化，專注優化架構與細節
+- 創意民主化：將高技術門檻，轉移到精準人類思維與結構描述
+- 獨立思考：AI 生成數據不代表終局真理，品質的「掌舵者」依然是您。
+
+謝謝閱讀 AI Portal 趨勢巨著。
+學會指令，就是掌握未來的最高權杖！
+  `;
+      const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `AI_Trends_Complete_Report_${email.split('@')[0]}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleStartCompile = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email && email.includes('@')) {
+      setStep('compiling');
+    }
+  };
+
+  const handleResetModal = () => {
+    setShowPdfModal(false);
+    setStep('input');
+    setEmail('');
+    setProgress(0);
+  };
+
   return (
     <div className="max-w-7xl mx-auto py-32 px-8 technical-grid">
       <motion.div
@@ -24,69 +130,46 @@ export default function AIIntro() {
             <p className="text-2xl text-slate-500 leading-relaxed font-serif italic mb-8">
               「AI 不僅僅是代碼的堆砌，它是人類智慧的數位鏡像，正在引發一場關於生產力本質的深刻變革。」
             </p>
-            <p className="text-sm text-slate-400 leading-relaxed font-medium">
-              在 AI Atlas，我們將 AI 視為一種「合成智慧」(Synthetic Intelligence)，它通過海量數據與神經網絡演算法，模擬人類的認知、推理與創造過程。這份指南將帶領您揭開這項技術的核心機制。
+            <p className="text-sm text-slate-400 leading-relaxed uppercase tracking-wider font-mono">
+              // CONCEPT REVOLUTION IN MACHINE LOGICS
             </p>
           </div>
         </header>
 
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-px bg-slate-100 border border-slate-100">
-          <div className="bg-white p-12 space-y-8 group hover:bg-slate-50 transition-colors">
-            <div className="flex justify-between items-start">
-              <div className="w-12 h-12 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded flex items-center justify-center">
-                <Lightbulb size={24} />
-              </div>
-              <span className="font-mono text-[40px] font-black text-slate-100 group-hover:text-indigo-600/10 transition-colors tracking-tighter">01</span>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-24 items-start">
+          <div className="space-y-16">
             <div>
-              <h3 className="text-xl font-display font-black text-slate-900 uppercase tracking-tight mb-4">數據為核心</h3>
-              <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                AI 透過深度學習 (Deep Learning) 架構，從海量未標註的數據中提取特徵，形成獨特的「神經元權重」。處理的維度越高，生成的精細度與關聯性就越強。
+              <span className="text-xs font-black text-indigo-600 uppercase tracking-widest block mb-4">章節一 // 工具即思維的延伸</span>
+              <p className="text-base text-slate-500 leading-relaxed">
+                在傳統時代，人類通過掌握特定的技術工具（如代盤、CAD、程式編輯器）來擴展能力邊界。然而，當生成式 AI 誕生，這條界線被打破：
+                軟體不再是固定死板的，它能聽懂人類自然的呼吸與指令。
+                學會「如何向 AI 提問、給予精確框架與邊界」，決定了您在 AI 時代的智識厚度。
               </p>
             </div>
-          </div>
 
-          <div className="bg-white p-12 space-y-8 group hover:bg-slate-50 transition-colors border-l border-slate-100">
-            <div className="flex justify-between items-start">
-              <div className="w-12 h-12 bg-amber-50 text-amber-600 border border-amber-100 rounded flex items-center justify-center">
-                <Zap size={24} />
-              </div>
-              <span className="font-mono text-[40px] font-black text-slate-100 group-hover:text-amber-600/10 transition-colors tracking-tighter">02</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { icon: Lightbulb, title: '知識密度', desc: '在幾秒內分析長達數十萬字的文件，並精準抓取規律。' },
+                { icon: Zap, title: '即時生產力', desc: '寫作、寫程式和圖像創作的邊際時間消耗被壓縮為零。' },
+                { icon: Users, title: '專家代理人', desc: '隨時隨地召喚專屬律師、行銷經理、代碼專家和哲學家。' }
+              ].map((item, i) => (
+                <div key={i} className="p-8 border border-slate-100 bg-white shadow-sm rounded-2xl hover:border-indigo-500/30 transition-all">
+                  <div className="h-10 w-10 text-indigo-600 bg-indigo-50 rounded-xl flex items-center justify-center mb-6">
+                    <item.icon size={18} />
+                  </div>
+                  <h4 className="text-sm font-black text-slate-900 mb-2 uppercase tracking-wider">{item.title}</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
             </div>
-            <div>
-              <h3 className="text-xl font-display font-black text-slate-900 uppercase tracking-tight mb-4">生成式革命</h3>
-              <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                基於 Transformer 架構的生成式模型 (Generative AI)，能夠根據極簡的自然語言指令 (Prompts)，在概率空間中計算出最符合邏輯的產出內容，實現跨媒體的無中生有。
-              </p>
-            </div>
-          </div>
 
-          <div className="bg-white p-12 space-y-8 group hover:bg-slate-50 transition-colors border-l border-slate-100">
-            <div className="flex justify-between items-start">
-              <div className="w-12 h-12 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded flex items-center justify-center">
-                <Users size={24} />
-              </div>
-              <span className="font-mono text-[40px] font-black text-slate-100 group-hover:text-emerald-600/10 transition-colors tracking-tighter">03</span>
-            </div>
-            <div>
-              <h3 className="text-xl font-display font-black text-slate-900 uppercase tracking-tight mb-4">協同進化的未來</h3>
-              <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                AI 的發展路徑正在從「自動化工具」轉變為「智能副駕駛」(Copilot)。它能大幅降低專業門檻，釋放人類在戰略規劃與純粹創意領域的高階潛能。
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <div className="relative border border-slate-200 bg-white p-12 md:p-24 overflow-hidden rounded-[2rem] shadow-sm">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-50 rounded-full blur-[120px] -mr-96 -mt-96" />
-          
-          <div className="relative z-10 flex flex-col lg:flex-row gap-20 items-center">
-            <div className="flex-1 space-y-12">
-              <div>
-                <h2 className="text-4xl md:text-5xl font-display font-black text-slate-900 leading-[0.9] uppercase tracking-tighter mb-8">
-                  DECODE THE <br/><span className="text-indigo-600 italic font-serif font-normal normal-case">Future</span> MARKET
-                </h2>
-                <div className="space-y-6">
+            <div className="bg-white p-10 border border-slate-200 rounded-[2.5rem] flex flex-col md:flex-row md:items-center justify-between gap-10">
+              <div className="space-y-4">
+                <span className="micro-label text-slate-300 tracking-widest block">REPORT COMPILATION // VOL_2024</span>
+                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight font-display">
+                  掌握更高維度的數位競爭力。
+                </h3>
+                <div className="space-y-2">
                   {[
                     '生產力重塑：將重複性勞動轉化為即時產出',
                     '創意民主化：將複雜的技術門檻轉向語言操作',
@@ -99,7 +182,10 @@ export default function AIIntro() {
                   ))}
                 </div>
               </div>
-              <button className="bg-slate-900 text-white px-10 py-4 rounded font-black text-[10px] uppercase tracking-[0.2em] hover:bg-indigo-600 transition-all shadow-2xl">
+              <button 
+                onClick={() => setShowPdfModal(true)}
+                className="bg-slate-900 text-white px-10 py-4 rounded font-black text-[10px] uppercase tracking-[0.2em] hover:bg-indigo-600 hover:scale-105 transition-all shadow-2xl shrink-0 cursor-pointer"
+              >
                 獲取完整報告 PDF
               </button>
             </div>
@@ -120,6 +206,110 @@ export default function AIIntro() {
           </div>
         </div>
       </motion.div>
+
+      {/* PDF Generation Lightbox Modal */}
+      <AnimatePresence>
+        {showPdfModal && (
+          <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="w-full max-w-md bg-white border border-editorial-border rounded-[2.5rem] shadow-2xl p-8 relative overflow-hidden text-center"
+            >
+              <button 
+                onClick={handleResetModal}
+                className="absolute right-6 top-6 p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <X size={16} />
+              </button>
+
+              <div className="mb-6 flex justify-center">
+                <div className="h-12 w-12 bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center rounded-full shrink-0">
+                  <Download size={20} />
+                </div>
+              </div>
+
+              {step === 'input' && (
+                <div>
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">完整趨勢報告下載通道</h3>
+                  <p className="text-xs text-slate-400 font-serif italic mt-1 mb-6">
+                    「請驗證您的授權，系統將在雲端即時彙整當日市場報告。」
+                  </p>
+                  <form onSubmit={handleStartCompile} className="space-y-4">
+                    <div className="text-left space-y-1">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">請填寫接收 PDF 的 Email 信箱</label>
+                      <input 
+                        type="email"
+                        required
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-editorial-accent rounded-xl px-4 py-3 text-xs text-slate-800 outline-none"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full py-4 bg-slate-950 hover:bg-indigo-600 text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all shadow-lg cursor-pointer"
+                    >
+                      開始編譯並下載 PDF (TEXT)
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {step === 'compiling' && (
+                <div className="space-y-6 py-6">
+                  <h3 className="text-xl font-black text-slate-900">核心伺服器編譯中...</h3>
+                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden relative">
+                    <div 
+                      className="h-full bg-indigo-600 transition-all duration-150" 
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <div className="font-mono text-[10px] text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-100 min-h-[50px] flex items-center justify-center">
+                    <span className="animate-pulse">{compilationLogs[logIndex]}</span>
+                  </div>
+                  <p className="text-[11px] font-mono font-bold text-indigo-600 uppercase tracking-widest">{progress}% COMPILE COMPLETION</p>
+                </div>
+              )}
+
+              {step === 'success' && (
+                <div className="space-y-6">
+                  <div className="flex justify-center">
+                    <div className="h-10 w-10 bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center rounded-full">
+                      <Check size={18} />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-black text-slate-900">下載就緒！</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
+                    我們已經順利編譯專屬報告，並透過您的瀏覽器直接觸發文件下載！若沒有看到自動保存，請點選下方按鈕重新索取。
+                  </p>
+                  <p className="text-[10px] font-mono text-slate-400">報告已發送至: {email}</p>
+                  
+                  <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
+                    <button
+                      onClick={triggerFileDownload}
+                      className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] uppercase tracking-widest rounded-xl transition-all shadow-md cursor-pointer"
+                    >
+                      重新觸發下載
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleResetModal();
+                        onViewChange?.('quiz');
+                      }}
+                      className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[10px] uppercase tracking-widest rounded-xl transition-all cursor-pointer"
+                    >
+                      使用 MATCH_ENGINE 匹配推薦工具
+                    </button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

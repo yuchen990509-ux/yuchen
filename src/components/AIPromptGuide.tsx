@@ -1,5 +1,10 @@
-import { motion } from 'motion/react';
-import { MessageSquare, Target, UserCircle, Layout, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { MessageSquare, Target, UserCircle, Layout, ArrowRight, Sparkles, CheckCircle2, ChevronDown, Check, Copy } from 'lucide-react';
+
+interface AIPromptGuideProps {
+  onViewChange?: (view: any) => void;
+}
 
 const GUIDE_STEPS = [
   {
@@ -36,12 +41,50 @@ const GUIDE_STEPS = [
   }
 ];
 
-export default function AIPromptGuide() {
+export default function AIPromptGuide({ onViewChange }: AIPromptGuideProps) {
+  const [showSandbox, setShowSandbox] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('社群小編 / 行銷策劃');
+  const [selectedTask, setSelectedTask] = useState('撰寫行銷貼文 / 強調獨特亮點');
+  const [selectedFormat, setSelectedFormat] = useState('生動、具豐富 Emojis 的短文');
+  const [customContext, setCustomContext] = useState('正在推廣一款全新的 AI 影像生成工具，強調其高畫質與每日免費配額。');
+  const [isCopied, setIsCopied] = useState(false);
+
+  const roles = [
+    '社群小編 / 行銷策劃',
+    '資深前端工程師 (React/TS)',
+    '英文商業書信翻譯 / 修改顧問',
+    '科普教育專攻教師',
+  ];
+
+  const tasks = [
+    '撰寫行銷貼文 / 強調獨特亮點',
+    '尋找我的程式碼效能瓶頸 & 重構',
+    '潤飾英文商業書信 & 修正文法',
+    '製作 10 分鐘科普主題簡報大綱',
+  ];
+
+  const formats = [
+    '生動、具豐富 Emojis 的短文',
+    '結構 Markdown 區塊與程式碼',
+    '表格條列式對比',
+    '條列式清單 (Bullet Points)',
+  ];
+
+  const assembledPrompt = `你現在是我的「${selectedRole}」，請幫我執行以下任務：「${selectedTask}」。
+背景與限制條件：【${customContext}】
+最後呈現格式要求：請使用「${selectedFormat}」來呈現。謝謝！`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(assembledPrompt);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 1500);
+  };
+
   return (
     <div className="max-w-5xl mx-auto py-20 px-8">
       {/* Header */}
       <div className="text-center mb-24 uppercase">
-        <h2 className="text-xs font-black tracking-[0.3em] text-indigo-600 mb-4">跟 AI 聊天的小撇步</h2>
+        <h2 className="text-xs font-black tracking-[0.3em] text-indigo-600 mb-4 font-mono">跟 AI 聊天的小撇步</h2>
         <h1 className="font-display text-4xl md:text-6xl font-black text-slate-900 tracking-tight mb-8">如何讓 AI<br/>聽懂你在說什麼？</h1>
         <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-slate-500 italic font-serif text-lg">
           <span>AI 不是神，它更像是一個很聰明但需要指令的實習生。</span>
@@ -95,7 +138,7 @@ export default function AIPromptGuide() {
             <div className={idx % 2 === 1 ? 'lg:order-2' : ''}>
               <div className={`mb-6 inline-flex items-center gap-3 px-4 py-2 rounded-full ${step.color}`}>
                 <step.icon size={18} />
-                <span className="text-xs font-black uppercase tracking-widest">祕訣 0{idx + 1}</span>
+                <span className="text-xs font-black uppercase tracking-widest font-mono">祕訣 0{idx + 1}</span>
               </div>
               <h3 className="font-display text-4xl font-black text-slate-900 uppercase tracking-tight mb-6">
                 {step.title}
@@ -112,7 +155,7 @@ export default function AIPromptGuide() {
 
             <div className={`space-y-4 ${idx % 2 === 1 ? 'lg:order-1' : ''}`}>
               <div className="bg-white p-8 border-l-4 border-red-500 rounded-r-xl border border-slate-100 shadow-sm shadow-red-500/5">
-                <span className="text-[10px] font-black uppercase tracking-widest text-red-400 block mb-4">😕 講得很模糊</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-red-400 block mb-4 font-mono">😕 講得很模糊</span>
                 <p className="font-serif text-lg text-slate-400 italic">「{step.bad}」</p>
               </div>
               <div className="flex justify-center -my-2 relative z-10">
@@ -121,7 +164,7 @@ export default function AIPromptGuide() {
                 </div>
               </div>
               <div className="bg-white p-8 border-l-4 border-indigo-600 shadow-xl shadow-indigo-900/5 rounded-r-xl border border-slate-100">
-                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 block mb-4">🤩 這樣講才對</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 block mb-4 font-mono">🤩 這樣講才對</span>
                 <p className="font-serif text-lg text-slate-900 leading-relaxed">「{step.good}」</p>
               </div>
             </div>
@@ -157,16 +200,109 @@ export default function AIPromptGuide() {
       </div>
 
       {/* Footer CTA */}
-      <div className="mt-32 text-center p-20 bg-indigo-50 border border-indigo-100 relative overflow-hidden rounded-[3rem] shadow-sm">
+      <div className="mt-32 text-center p-12 md:p-20 bg-indigo-50 border border-indigo-100 relative overflow-hidden rounded-[3rem] shadow-sm">
         <div className="relative z-10">
           <p className="font-serif text-2xl italic text-slate-600 max-w-3xl mx-auto leading-relaxed mb-10">
             「別把 AI 當成神，把它當成身邊那個隨時待命、但需要你多教教它的實習生就對了。」
           </p>
-          <button className="bg-slate-900 text-white px-12 py-5 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-indigo-600 transition-all rounded-full shadow-2xl">
-            現在就去跟它聊聊看
+          
+          <button 
+            onClick={() => setShowSandbox(!showSandbox)}
+            className="bg-slate-900 text-white px-12 py-5 text-[10px] font-black uppercase tracking-[0.3em] hover:bg-indigo-600 hover:scale-105 transition-all rounded-full shadow-2xl cursor-pointer"
+          >
+            {showSandbox ? '關閉指令魔法沙盒' : '點此打開內建指令魔法沙盒'}
           </button>
         </div>
       </div>
+
+      {/* Interactive Command Sandbox */}
+      <AnimatePresence>
+        {showSandbox && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden bg-slate-55 border border-slate-200 rounded-[2.5rem] mt-12 p-8 md:p-12 shadow-2xl relative"
+          >
+            <div className="flex items-center gap-3 mb-8">
+              <span className="h-6 w-6 text-white bg-indigo-600 rounded-full flex items-center justify-center text-xs">✨</span>
+              <h3 className="font-display text-xl font-black text-slate-900 uppercase tracking-tight">指令組裝矩陣沙盒 (Prompt Matrix Sandbox)</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block font-mono">1. 選擇專業角色</label>
+                <div className="relative">
+                  <select 
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="w-full bg-white border border-slate-200 px-4 py-3 text-xs rounded-xl focus:outline-none focus:border-indigo-500 cursor-pointer appearance-none text-slate-700 font-bold"
+                  >
+                    {roles.map((r, i) => <option key={i} value={r}>{r}</option>)}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-4 top-4 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block font-mono">2. 指定具體任務</label>
+                <div className="relative">
+                  <select 
+                    value={selectedTask}
+                    onChange={(e) => setSelectedTask(e.target.value)}
+                    className="w-full bg-white border border-slate-200 px-4 py-3 text-xs rounded-xl focus:outline-none focus:border-indigo-500 cursor-pointer appearance-none text-slate-700 font-bold"
+                  >
+                    {tasks.map((t, i) => <option key={i} value={t}>{t}</option>)}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-4 top-4 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block font-mono">3. 指定輸出格式</label>
+                <div className="relative">
+                  <select 
+                    value={selectedFormat}
+                    onChange={(e) => setSelectedFormat(e.target.value)}
+                    className="w-full bg-white border border-slate-200 px-4 py-3 text-xs rounded-xl focus:outline-none focus:border-indigo-500 cursor-pointer appearance-none text-slate-700 font-bold"
+                  >
+                    {formats.map((f, i) => <option key={i} value={f}>{f}</option>)}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-4 top-4 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 mb-8">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block font-mono">4. 自訂任務背景與受眾條件</label>
+              <textarea
+                value={customContext}
+                onChange={(e) => setCustomContext(e.target.value)}
+                placeholder="請輸入更多限制條件，例如目標群眾，语气或排除字眼..."
+                rows={3}
+                className="w-full bg-white border border-slate-200 px-4 py-3 text-xs rounded-xl focus:outline-none focus:border-indigo-500 text-slate-700"
+              />
+            </div>
+
+            {/* Compiled code outputs */}
+            <div className="p-6 bg-slate-900 rounded-2xl relative shadow-inner">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <span className="text-[9px] font-mono tracking-widest text-slate-500 uppercase font-bold">Assembled Engine Command // prompt.txt</span>
+                <button 
+                  onClick={handleCopy}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] uppercase tracking-widest rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-lg"
+                >
+                  {isCopied ? <Check size={12} /> : <Copy size={12} />}
+                  {isCopied ? '已複製！' : '複製指令'}
+                </button>
+              </div>
+              <p className="font-mono text-xs text-indigo-300 leading-relaxed whitespace-pre-wrap select-all">
+                {assembledPrompt}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

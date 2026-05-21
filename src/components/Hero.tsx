@@ -52,9 +52,19 @@ export default function Hero({ searchQuery, onSearchChange }: HeroProps) {
           className="w-full max-w-2xl relative group"
         >
           <div className="absolute -inset-4 bg-editorial-accent/5 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition duration-1000" />
-          <div className="relative flex items-center bg-white border border-editorial-border rounded-2xl p-1.5 pl-6 shadow-xl shadow-slate-200/20 transition-all group-hover:border-editorial-accent/55">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              const el = document.getElementById('core-registry-section');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
+            className="relative flex items-center bg-white border border-editorial-border rounded-2xl p-1.5 pl-6 shadow-xl shadow-slate-200/20 transition-all group-hover:border-editorial-accent/55"
+          >
             <Search className="text-slate-400" size={20} />
             <input
+              id="search-input"
               type="text"
               placeholder="SEARCH THE DATABASE_v2..."
               value={searchQuery}
@@ -62,11 +72,14 @@ export default function Hero({ searchQuery, onSearchChange }: HeroProps) {
               className="w-full bg-transparent px-4 py-4 font-mono text-xs uppercase tracking-widest focus:outline-none text-slate-900 placeholder-slate-300"
             />
             <div className="hidden sm:flex items-center pr-2">
-              <button className="bg-slate-900 text-white px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-editorial-accent transition-all shadow-xl">
+              <button 
+                type="submit"
+                className="bg-slate-900 text-white px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-editorial-accent transition-all shadow-xl cursor-pointer"
+              >
                 執行檢索
               </button>
             </div>
-          </div>
+          </form>
         </motion.div>
 
         <div className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-12 border-t border-editorial-line pt-12 w-full max-w-4xl">

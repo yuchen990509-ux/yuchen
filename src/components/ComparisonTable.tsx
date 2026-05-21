@@ -2,7 +2,11 @@ import { motion } from 'motion/react';
 import { AI_TOOLS } from '../data/tools';
 import { Check, X, Info } from 'lucide-react';
 
-export default function ComparisonTable() {
+interface ComparisonTableProps {
+  onViewTool?: (toolName: string) => void;
+}
+
+export default function ComparisonTable({ onViewTool }: ComparisonTableProps) {
   const toolsToCompare = AI_TOOLS.filter(t => t.pros && t.cons);
 
   return (
@@ -103,7 +107,10 @@ export default function ComparisonTable() {
                 <span className="text-[9px] font-mono font-bold text-slate-300 uppercase tracking-widest">Ver: 2024.11</span>
                 <span className="text-[9px] font-mono font-bold text-slate-300 uppercase tracking-widest">Loc: Cloud_Mtx</span>
               </div>
-              <button className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-indigo-600 transition-colors">
+              <button 
+                onClick={() => onViewTool?.(tool.name)}
+                className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-indigo-600 transition-colors cursor-pointer"
+              >
                 VIEW SOURCE_REPO
               </button>
             </div>

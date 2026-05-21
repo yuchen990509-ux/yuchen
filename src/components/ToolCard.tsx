@@ -5,9 +5,11 @@ import { AITool } from '../types';
 
 interface ToolCardProps {
   tool: AITool;
+  isBookmarked?: boolean;
+  onToggleBookmark?: (id: string) => void;
 }
 
-export default function ToolCard({ tool }: ToolCardProps) {
+export default function ToolCard({ tool, isBookmarked = false, onToggleBookmark }: ToolCardProps) {
   const [isZoomed, setIsZoomed] = useState(false);
 
   const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
@@ -89,8 +91,14 @@ export default function ToolCard({ tool }: ToolCardProps) {
 
       {/* Actions */}
       <div className="flex items-center gap-3 pl-4 border-l border-editorial-line">
-        <button className="hidden sm:block p-1.5 text-slate-300 hover:text-slate-900 transition-colors">
-          <BookmarkPlus size={16} />
+        <button 
+          onClick={() => onToggleBookmark?.(tool.id)}
+          className={`hidden sm:block p-1.5 transition-colors cursor-pointer ${
+            isBookmarked ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-slate-900'
+          }`}
+          title={isBookmarked ? "由收藏中移除" : "加入我的收藏"}
+        >
+          {isBookmarked ? <Star size={16} fill="currentColor" /> : <BookmarkPlus size={16} />}
         </button>
         <a
           href={tool.url}

@@ -41,7 +41,11 @@ const RECOMMENDATIONS: Record<string, string> = {
   "default": "ChatGPT"
 };
 
-export default function AIQuiz() {
+interface AIQuizProps {
+  onViewTool?: (toolName: string) => void;
+}
+
+export default function AIQuiz({ onViewTool }: AIQuizProps) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [result, setResult] = useState<string | null>(null);
@@ -143,7 +147,16 @@ export default function AIQuiz() {
                   <RotateCcw size={16} />
                   重新測驗
                 </button>
-                <button className="flex items-center justify-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-2xl text-sm font-bold hover:bg-editorial-accent transition-all shadow-xl">
+                <button 
+                  onClick={() => {
+                    if (onViewTool && result) {
+                      const match = result.match(/[A-Za-z0-9-]+/);
+                      const query = match ? match[0] : result;
+                      onViewTool(query);
+                    }
+                  }}
+                  className="flex items-center justify-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-2xl text-sm font-bold hover:bg-editorial-accent transition-all shadow-xl cursor-pointer"
+                >
                   立即探索該工具
                 </button>
               </div>
