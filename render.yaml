@@ -1,0 +1,33 @@
+# Render Blueprint Specification for AI Portal
+# This file automates deployment settings on Render.com.
+# To deploy, go to Dashboard -> Blueprints -> New Blueprint on Render.
+
+services:
+  # Option 1: Static Site (Highly Recommended & Completely Free!)
+  # Direct lightning-fast static CDN hosting. Ideal for Vite React SPAs.
+  - type: web
+    name: ai-portal-static-instance
+    env: static
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    routes:
+      - from: /*
+        to: /index.html
+        status: 200
+
+  # Option 2: Web Service (Containerized Node.js Host)
+  # Standard platform container running the Express web server.
+  - type: web
+    name: ai-portal-web-service
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: NODE_ENV
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false
+        placeholder: "Insert your Gemini API key (optional)"
